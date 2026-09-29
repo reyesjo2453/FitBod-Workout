@@ -29,4 +29,10 @@ The muscle recovery display is an app-generated estimate, not a medical assessme
 
 ## Technical notes
 
-The app lives in `index.html` and uses JavaScript in the browser with no server-side account or tracking service. Its interface loads Tailwind CSS and icons from CDNs, so those resources require an internet connection on first load.
+The app lives in `index.html` and uses JavaScript in the browser with no server-side account needed for local workout logging. The optional Fitness Connect connection stores a private snapshot when you choose to sync. Its interface loads Tailwind CSS and icons from CDNs, so those resources require an internet connection on first load.
+
+## ChatGPT connection (optional)
+
+Use **Sync with ChatGPT** in the app's settings to send a snapshot to [Fitness Connect](https://fitness-connect.reyesjo2453.chatgpt.site). Sign in, review the incoming record counts, and select **Save synced records**. If the new window cannot receive the records, export a JSON backup from this app and upload it at Fitness Connect instead.
+
+Install and connect the personal **Fitness Connect** plugin in ChatGPT to read your synced records. The connection supports nutrition summaries, meals, recipes, weight history, completed workouts, personal records, and recovery estimates. It cannot modify your app records. Sync again after changes; ChatGPT reads the last synced copy. Only the owner's account can access this personal connection, and Gemini API keys are excluded from stored snapshots.
