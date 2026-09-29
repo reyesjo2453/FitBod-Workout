@@ -436,10 +436,16 @@
           </div>
         </div>
 
-        <!-- Local Data Management & Backup -->
+        <div class="mt-6 pt-5 border-t border-zinc-800">
+<h3 class="text-sm font-semibold text-white mb-2">ChatGPT Connection</h3>
+<p class="text-sm text-zinc-400 mb-3">Send a read-only snapshot of your workout history, personal records, and recovery estimates to your private Fitness Connect. Review and save in the new window.</p>
+<button type="button" onclick="syncFitnessConnect()" class="px-4 py-3 bg-brand-500 text-black rounded-xl font-bold text-sm">Sync with ChatGPT</button>
+<p class="text-sm text-zinc-400 mt-2">Sync after changes to keep ChatGPT up to date. If the window cannot receive records, export a backup below and upload it at <a class="underline text-brand-400" href="https://fitness-connect.reyesjo2453.chatgpt.site" target="_blank" rel="noopener">Fitness Connect</a>.</p>
+</div>
+<!-- Local Data Management & Backup -->
         <div class="mt-6 pt-5 border-t border-zinc-800">
           <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">Data & Local Storage</h3>
-          <p class="text-xs text-zinc-400 mb-3">All your workouts and custom PRs remain strictly in your browser's local cache. No external server tracking.</p>
+          <p class="text-xs text-zinc-400 mb-3">Workouts and PRs are saved in this browser. The optional Sync with ChatGPT button shares a snapshot with your private connection.</p>
           <div class="flex flex-wrap gap-2">
             <button onclick="exportUserData()" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 rounded-xl text-xs font-medium transition-colors flex items-center">
               <svg class="w-3.5 h-3.5 mr-1.5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -2625,5 +2631,38 @@
       setupPWAandIcons();
     });
   </script>
+
+<script>
+// Manual snapshot sync; local data remains the authority for edits.
+function syncFitnessConnect() {
+  const origin = "https://fitness-connect.reyesjo2453.chatgpt.site";
+  const kind = "workouts";
+  const nonce = crypto.randomUUID();
+  const source = state;
+  const allowed = ["history","user","muscleRecovery","lastRecoveryUpdate","personalRecords"];
+  const data = Object.fromEntries(allowed.filter(key => source[key] !== undefined).map(key => [key, source[key]]));
+  const snapshot = JSON.parse(JSON.stringify(data));
+  const popup = window.open(origin + '/?connect=' + kind + '&nonce=' + encodeURIComponent(nonce), '_blank');
+  if (!popup) {
+    alert('Allow pop-ups to sync, or export a JSON backup and upload it at ' + origin);
+    return;
+  }
+  let timer;
+  function receive(event) {
+    if (event.origin !== origin || event.source !== popup || event.data?.nonce !== nonce) return;
+    if (event.data.type === 'fitness-ready') {
+      popup.postMessage({type: 'fitness-snapshot', kind, nonce, data: snapshot}, origin);
+    }
+    if (event.data.type === 'fitness-synced') {
+      cleanup();
+      alert('Your snapshot is synced for ChatGPT. Sync again after adding or editing records.');
+    }
+  }
+  function cleanup() { window.removeEventListener('message', receive); clearTimeout(timer); }
+  window.addEventListener('message', receive);
+  timer = setTimeout(cleanup, 600000);
+}
+</script>
+
 </body>
 </html>
