@@ -143,6 +143,19 @@
           </div>
         </div>
 
+        <!-- Workout Gym -->
+        <div class="mt-3 pt-3 border-t border-zinc-800/80 flex flex-col sm:flex-row sm:items-center gap-2">
+          <label class="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold sm:w-28">Today's Gym</label>
+          <div class="flex flex-1 gap-2">
+            <select id="workout-gym-select" onchange="setWorkoutGym(this.value)" class="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-brand-500">
+              <option value="Base Gym">Base Gym</option>
+              <option value="Planet Fitness">Planet Fitness</option>
+              <option value="Other">Other</option>
+            </select>
+            <input id="workout-gym-other" type="text" placeholder="Gym name" onchange="setCustomWorkoutGym(this.value)" class="hidden flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 focus:outline-none focus:border-brand-500">
+          </div>
+        </div>
+
         <!-- Quick Muscle Target Tags -->
         <div id="workout-targeted-muscles" class="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-zinc-800/80">
           <!-- Dynamically populated tags -->
@@ -1040,6 +1053,7 @@
         isActive: false,
         startTime: null,
         elapsedSeconds: 0,
+        gym: 'Base Gym',
         exercises: []
       },
       // Workout history logs
@@ -1298,6 +1312,7 @@
           isActive: false,
           startTime: null,
           elapsedSeconds: 0,
+          gym: state.user.currentGym || 'Base Gym',
           exercises: builtExercises
         };
 
@@ -1406,6 +1421,7 @@
         isActive: false,
         startTime: null,
         elapsedSeconds: 0,
+        gym: state.user.currentGym || 'Base Gym',
         exercises: builtExercises
       };
 
@@ -1419,6 +1435,15 @@
 
       document.getElementById('workout-headline').innerText = w.title || "Personalized Routine";
       document.getElementById('workout-target-split').innerText = (w.split || "Fresh").toUpperCase();
+      if (!w.gym) w.gym = state.user.currentGym || 'Base Gym';
+      const gymSelect = document.getElementById('workout-gym-select');
+      const gymOther = document.getElementById('workout-gym-other');
+      if (gymSelect && gymOther) {
+        const standardGym = ['Base Gym', 'Planet Fitness'].includes(w.gym) ? w.gym : 'Other';
+        gymSelect.value = standardGym;
+        gymOther.classList.toggle('hidden', standardGym !== 'Other');
+        if (standardGym === 'Other') gymOther.value = w.gym === 'Other' ? '' : w.gym;
+      }
 
       // Estimate duration
       const totalSets = w.exercises.reduce((acc, ex) => acc + ex.sets.length, 0);
@@ -1504,16 +1529,10 @@
                   <span>Rest: ${ex.restSeconds || 60}s</span>
                 </div>
                 ${coachNoteBox}
-                <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div class="mt-2">
                   <label class="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
-                    Gym / Location
-                    <select onchange="updateExerciseContext(${exIndex}, 'gym', this.value)" class="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-brand-500">
-                      ${['Base Gym','Planet Fitness','Other'].map(g => `<option value="${g}" ${(ex.gym || state.user.currentGym || 'Base Gym') === g ? 'selected' : ''}>${g}</option>`).join('')}
-                    </select>
-                  </label>
-                  <label class="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
-                    Machine / Station
-                    <input type="text" value="${ex.machineLabel || ''}" placeholder="e.g. PF Row #1" onchange="updateExerciseContext(${exIndex}, 'machineLabel', this.value)" class="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-brand-500">
+                    Machine / Station <span class="normal-case text-zinc-600">(optional)</span>
+                    <input type="text" value="${ex.machineLabel || ''}" placeholder="e.g. Row #1 or Hammer Strength" onchange="updateExerciseContext(${exIndex}, 'machineLabel', this.value)" class="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-brand-500">
                   </label>
                 </div>
               </div>
@@ -1573,10 +1592,47 @@
       }).join('');
     }
 
+    function applyWorkoutGymToExercises(gym) {
+      state.currentWorkout.exercises.forEach(ex => { ex.gym = gym; });
+    }
+
+    function setWorkoutGym(value) {
+      const gymOther = document.getElementById('workout-gym-other');
+      if (value === 'Other') {
+        state.currentWorkout.gym = 'Other';
+        if (gymOther) {
+          gymOther.classList.remove('hidden');
+          gymOther.focus();
+        }
+      } else {
+        state.currentWorkout.gym = value;
+        state.user.currentGym = value;
+        applyWorkoutGymToExercises(value);
+        saveStateToStorage();
+        renderWorkoutView();
+      }
+    }
+
+    function setCustomWorkoutGym(value) {
+      const gym = String(value || '').trim();
+      if (!gym) return;
+      state.currentWorkout.gym = gym;
+      state.user.currentGym = gym;
+      applyWorkoutGymToExercises(gym);
+      saveStateToStorage();
+      renderWorkoutView();
+    }
+
     function toggleWorkoutSession() {
       const w = state.currentWorkout;
       if (!w.isActive) {
         // Start Workout
+        if (!w.gym || w.gym === 'Other') {
+          showToast("Choose today's gym before starting the workout.", "info");
+          return;
+        }
+        state.user.currentGym = w.gym;
+        applyWorkoutGymToExercises(w.gym);
         w.isActive = true;
         w.startTime = Date.now() - (w.elapsedSeconds * 1000);
         startWorkoutTimerLoop();
@@ -1725,6 +1781,7 @@
         durationMinutes: durationMins,
         totalVolume: Math.round(totalVolume),
         unit: state.user.unit,
+        gym: w.gym || state.user.currentGym || 'Base Gym',
         completedSets: completedSetsCount,
         exercises: JSON.parse(JSON.stringify(w.exercises))
       };
@@ -1754,7 +1811,7 @@
     }
 
     function getExerciseContextKey(ex) {
-      const gym = ex.gym || state.user.currentGym || 'Base Gym';
+      const gym = ex.gym || state.currentWorkout.gym || state.user.currentGym || 'Base Gym';
       const machine = ex.machineLabel || ex.equipment || 'unspecified';
       return `${ex.id}::${normalizeContextPart(gym)}::${normalizeContextPart(machine)}`;
     }
