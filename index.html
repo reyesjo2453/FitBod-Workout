@@ -1007,6 +1007,7 @@
         splitStyle: 'greg_auto',
         unit: 'lbs', // 'lbs' or 'kg'
         equipment: ['barbell', 'dumbbell', 'cable', 'pull_up_bar', 'machine', 'bodyweight'],
+        currentGym: 'Base Gym',
         gregSchedule: {
           1: 'greg_day1', // Monday: Day 1 (Push/Pull)
           2: 'greg_day2', // Tuesday: Day 2 (Quads/Hams)
@@ -1084,6 +1085,7 @@
         if (stored) {
           const parsed = JSON.parse(stored);
           state = { ...state, ...parsed };
+          if (!state.user.currentGym) state.user.currentGym = 'Base Gym';
           if (!state.user.gregSchedule) {
             state.user.gregSchedule = {
               1: 'greg_day1',
@@ -1391,7 +1393,9 @@
           equipment: ex.equipment,
           type: ex.type,
           restSeconds: goal === 'strength' ? 90 : 60,
-          sets: sets
+          sets: sets,
+          gym: state.user.currentGym || 'Base Gym',
+          machineLabel: ''
         };
       });
 
@@ -1468,8 +1472,8 @@
 
       // Render Exercise Cards
       container.innerHTML = w.exercises.map((ex, exIndex) => {
-        const pr = state.personalRecords[ex.id];
-        const prBadge = pr ? `<span class="text-[10px] text-amber-400 font-medium ml-2">PR: ${pr.weight}${state.user.unit} × ${pr.reps}</span>` : '';
+        const pr = getExerciseContextPR(ex);
+        const prBadge = pr ? `<span class="text-[10px] text-amber-400 font-medium ml-2">PR here: ${pr.weight}${state.user.unit} × ${pr.reps}</span>` : '';
         const coachBadge = ex.coachRole ? `
           <span class="text-[10px] font-bold px-2 py-0.5 rounded ml-2 ${ex.coachRole === 'primary' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-zinc-800 text-zinc-300 border border-zinc-700'}">
             ${ex.coachRole === 'primary' ? '⭐ Coach Primary' : '🔄 Fallback'}
@@ -1500,6 +1504,18 @@
                   <span>Rest: ${ex.restSeconds || 60}s</span>
                 </div>
                 ${coachNoteBox}
+                <div class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <label class="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
+                    Gym / Location
+                    <select onchange="updateExerciseContext(${exIndex}, 'gym', this.value)" class="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-brand-500">
+                      ${['Base Gym','Planet Fitness','Other'].map(g => `<option value="${g}" ${(ex.gym || state.user.currentGym || 'Base Gym') === g ? 'selected' : ''}>${g}</option>`).join('')}
+                    </select>
+                  </label>
+                  <label class="text-[10px] uppercase tracking-wider text-zinc-500 font-semibold">
+                    Machine / Station
+                    <input type="text" value="${ex.machineLabel || ''}" placeholder="e.g. PF Row #1" onchange="updateExerciseContext(${exIndex}, 'machineLabel', this.value)" class="mt-1 w-full bg-zinc-800 border border-zinc-700 rounded-lg px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-brand-500">
+                  </label>
+                </div>
               </div>
 
               <!-- Exercise Action Menu -->
@@ -1596,7 +1612,7 @@
         triggerRestTimer(ex.restSeconds || 60);
 
         // Check PR achievement
-        checkPersonalRecord(ex.id, ex.name, Number(set.weight), Number(set.reps));
+        checkPersonalRecord(ex, Number(set.weight), Number(set.reps));
 
         // If workout wasn't marked active yet, start it
         if (!state.currentWorkout.isActive) {
@@ -1733,21 +1749,50 @@
       switchTab('recovery');
     }
 
-    function checkPersonalRecord(exId, exName, weight, reps) {
+    function normalizeContextPart(value) {
+      return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'unspecified';
+    }
+
+    function getExerciseContextKey(ex) {
+      const gym = ex.gym || state.user.currentGym || 'Base Gym';
+      const machine = ex.machineLabel || ex.equipment || 'unspecified';
+      return `${ex.id}::${normalizeContextPart(gym)}::${normalizeContextPart(machine)}`;
+    }
+
+    function getExerciseContextPR(ex) {
+      return state.personalRecords[getExerciseContextKey(ex)] || state.personalRecords[ex.id] || null;
+    }
+
+    function updateExerciseContext(exIndex, field, value) {
+      const ex = state.currentWorkout.exercises[exIndex];
+      if (!ex) return;
+      ex[field] = String(value || '').trim();
+      if (field === 'gym' && ex.gym) state.user.currentGym = ex.gym;
+      saveStateToStorage();
+      renderWorkoutView();
+    }
+
+    function checkPersonalRecord(ex, weight, reps) {
       if (weight <= 0) return;
-      const currentPr = state.personalRecords[exId];
-      // 1RM Brzycki formula approximation: 1RM = Weight * (36 / (37 - reps))
+      const contextKey = getExerciseContextKey(ex);
+      const currentPr = state.personalRecords[contextKey];
+      // Keep PRs machine/location-specific so unlike machines are never compared directly.
       const calculated1RM = weight * (36 / (37 - Math.min(36, reps)));
       const old1RM = currentPr ? (currentPr.weight * (36 / (37 - Math.min(36, currentPr.reps)))) : 0;
 
       if (!currentPr || calculated1RM > old1RM) {
-        state.personalRecords[exId] = {
+        state.personalRecords[contextKey] = {
           weight: weight,
           reps: reps,
           estimated1RM: Math.round(calculated1RM),
-          date: new Date().toLocaleDateString()
+          date: new Date().toLocaleDateString(),
+          exerciseId: ex.id,
+          gym: ex.gym || state.user.currentGym || 'Base Gym',
+          machineLabel: ex.machineLabel || '',
+          equipment: ex.equipment || ''
         };
-        showToast(`🏆 New PR on ${exName}! ${weight}${state.user.unit} × ${reps}`, "pr");
+        const where = [ex.gym || state.user.currentGym, ex.machineLabel].filter(Boolean).join(' • ');
+        showToast(`🏆 New PR on ${ex.name}${where ? ' @ ' + where : ''}! ${weight}${state.user.unit} × ${reps}`, "pr");
       }
     }
 
