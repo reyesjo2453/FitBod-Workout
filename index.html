@@ -2031,6 +2031,16 @@
       }).join('');
     }
 
+    function escapeHistoryText(value) {
+      return String(value || '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[char]);
+    }
+
     function renderHistoryView() {
       const historyList = document.getElementById('workout-history-list');
       const countEl = document.getElementById('history-total-count');
@@ -2067,19 +2077,24 @@
         <div class="bg-zinc-950/70 border border-zinc-800 rounded-xl p-4">
           <div class="flex items-center justify-between mb-2">
             <div>
-              <span class="text-xs text-brand-400 font-semibold">${log.date}</span>
-              <h4 class="font-bold text-sm text-white">${log.title}</h4>
+              <span class="text-xs text-brand-400 font-semibold">${escapeHistoryText(log.date)}</span>
+              <h4 class="font-bold text-sm text-white">${escapeHistoryText(log.title)}</h4>
+              <span class="block text-[10px] text-zinc-400 mt-0.5">Gym: ${escapeHistoryText(log.gym || 'Not recorded')}</span>
             </div>
             <div class="text-right">
-              <span class="text-xs font-mono font-bold text-zinc-300">${log.totalVolume.toLocaleString()} ${log.unit || state.user.unit}</span>
-              <span class="block text-[10px] text-zinc-500">${log.durationMinutes} mins • ${log.completedSets} sets</span>
+              <span class="text-xs font-mono font-bold text-zinc-300">${(Number(log.totalVolume) || 0).toLocaleString()} ${escapeHistoryText(log.unit || state.user.unit)}</span>
+              <span class="block text-[10px] text-zinc-500">${Number(log.durationMinutes) || 0} mins • ${Number(log.completedSets) || 0} sets</span>
             </div>
           </div>
 
           <div class="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-zinc-800/80">
-            ${(log.exercises || []).map(e => `
-              <span class="text-[10px] px-2 py-0.5 rounded bg-zinc-800/80 text-zinc-300">${e.name}</span>
-            `).join('')}
+            ${(log.exercises || []).map(e => {
+              const machine = e.machineLabel || e.equipment;
+              const context = machine ? escapeHistoryText(machine) : 'Machine not recorded';
+              return `
+                <span class="text-[10px] px-2 py-0.5 rounded bg-zinc-800/80 text-zinc-300">${escapeHistoryText(e.name)} <span class="text-zinc-500">· ${context}</span></span>
+              `;
+            }).join('')}
           </div>
         </div>
       `).join('');
