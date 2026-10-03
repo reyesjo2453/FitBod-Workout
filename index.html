@@ -774,7 +774,7 @@
         defaultWeight: 100, 
         defaultReps: 10, 
         defaultSets: 3, 
-        restSeconds: 60,
+        restSeconds: 90,
         coachGreg: { day: 'Day 1', role: 'primary', note: 'Push to absolute mechanical failure. Progressive overload target: 110-115 lbs.' },
         fallbacks: ['dumbbell_bench_press', 'incline_chest_press_machine', 'barbell_bench_press', 'push_up']
       },
@@ -788,7 +788,7 @@
         defaultWeight: 65, 
         defaultReps: 10, 
         defaultSets: 3, 
-        restSeconds: 60,
+        restSeconds: 90,
         coachGreg: { day: 'Day 1', role: 'primary', note: 'Target upper pectorals; keep shoulders retracted.' },
         fallbacks: ['incline_dumbbell_press', 'incline_barbell_bench_press', 'machine_chest_press']
       },
@@ -802,7 +802,7 @@
         defaultWeight: 130, 
         defaultReps: 8, 
         defaultSets: 3, 
-        restSeconds: 60,
+        restSeconds: 90,
         coachGreg: { day: 'Day 1', role: 'primary', note: 'Control the eccentric (negative) for 3 seconds. Push set 3 to failure.' },
         fallbacks: ['pull_up', 'seated_cable_row', 'dumbbell_single_row']
       },
@@ -816,7 +816,7 @@
         defaultWeight: 60, 
         defaultReps: 10, 
         defaultSets: 2, 
-        restSeconds: 60,
+        restSeconds: 90,
         coachGreg: { day: 'Day 1', role: 'primary', note: 'Shoulders are pre-exhausted; maintain constant mechanical tension.' },
         fallbacks: ['dumbbell_shoulder_press', 'overhead_barbell_press', 'lateral_raise']
       },
@@ -846,7 +846,7 @@
         defaultWeight: 65, 
         defaultReps: 10, 
         defaultSets: 3, 
-        restSeconds: 60,
+        restSeconds: 90,
         coachGreg: { day: 'Day 2', role: 'primary', note: 'Keep hips pinned firmly to the pad; avoid hyperextending lower back.' },
         fallbacks: ['lying_leg_curl', 'dumbbell_rdl', 'romanian_deadlift']
       },
@@ -860,7 +860,7 @@
         defaultWeight: 80, 
         defaultReps: 12, 
         defaultSets: 2, 
-        restSeconds: 60,
+        restSeconds: 90,
         coachGreg: { day: 'Day 2', role: 'primary', note: 'Hard squeeze at the peak of the contraction for 1 second.' },
         fallbacks: ['goblet_squat', 'walking_lunges', 'sissy_squat']
       },
@@ -876,7 +876,7 @@
         defaultWeight: 50, 
         defaultReps: 10, 
         defaultSets: 3, 
-        restSeconds: 60,
+        restSeconds: 90,
         coachGreg: { day: 'Day 3', role: 'primary', note: 'Pull through the elbows; squeeze scapulae together at full retraction.' },
         fallbacks: ['chest_supported_tbar_row', 'dumbbell_single_row', 'barbell_bent_row', 'lat_pulldown']
       },
@@ -890,7 +890,7 @@
         defaultWeight: 35, 
         defaultReps: 15, 
         defaultSets: 3, 
-        restSeconds: 60,
+        restSeconds: 90,
         coachGreg: { day: 'Day 3', role: 'primary', note: 'Maintain constant tension on chest; do not let elbows hyperextend behind torso.' },
         fallbacks: ['cable_chest_fly', 'dumbbell_chest_fly', 'incline_dumbbell_press']
       },
@@ -904,7 +904,7 @@
         defaultWeight: 45, 
         defaultReps: 12, 
         defaultSets: 2, 
-        restSeconds: 60,
+        restSeconds: 90,
         coachGreg: { day: 'Day 3', role: 'primary', note: 'Flare the rope outward at the absolute bottom of the contraction.' },
         fallbacks: ['skull_crushers', 'overhead_tricep_extension', 'dips_chest']
       },
@@ -920,7 +920,7 @@
         defaultWeight: 100, 
         defaultReps: 10, 
         defaultSets: 3, 
-        restSeconds: 60,
+        restSeconds: 90,
         coachGreg: { day: 'Day 4', role: 'primary', note: 'Isolate the hamstrings completely; do not bounce weight off stack.' },
         fallbacks: ['seated_leg_curls', 'romanian_deadlift', 'dumbbell_rdl']
       },
@@ -934,7 +934,7 @@
         defaultWeight: 190, 
         defaultReps: 15, 
         defaultSets: 3, 
-        restSeconds: 60,
+        restSeconds: 90,
         coachGreg: { day: 'Day 4', role: 'primary', note: 'Pause for 1 full second at the bottom stretch of every rep.' },
         fallbacks: ['standing_calf_raise', 'leg_press_calf_raise']
       },
@@ -948,7 +948,7 @@
         defaultWeight: 50, 
         defaultReps: 15, 
         defaultSets: 2, 
-        restSeconds: 60,
+        restSeconds: 90,
         coachGreg: { day: 'Day 4', role: 'primary', note: 'Curl the spine forward; do not just hinge at the hips.' },
         fallbacks: ['cable_woodchopper', 'hanging_leg_raise', 'cable_kneeling_crunch', 'plank']
       },
@@ -1248,31 +1248,31 @@
         if (splitType === 'greg_day1') {
           routineTitle = autoGregInfo ? `Coach Greg (${autoGregInfo.dayName}) - Day 1: Upper (Push/Pull)` : "Coach Greg - Day 1: Upper (Push/Pull)";
           dayExercises = [
-            { id: 'incline_chest_press_machine', sets: 3, reps: 10, weight: 65, rest: 60 },
-            { id: 'machine_chest_press', sets: 3, reps: 10, weight: 100, rest: 60 },
-            { id: 'lat_pulldown', sets: 3, reps: 8, weight: 130, rest: 60 },
-            { id: 'machine_shoulder_press', sets: 2, reps: 10, weight: 60, rest: 60 }
+            { id: 'incline_chest_press_machine', sets: 3, reps: 10, weight: 65, rest: 90 },
+            { id: 'machine_chest_press', sets: 3, reps: 10, weight: 100, rest: 90 },
+            { id: 'lat_pulldown', sets: 3, reps: 8, weight: 130, rest: 90 },
+            { id: 'machine_shoulder_press', sets: 2, reps: 10, weight: 60, rest: 90 }
           ];
         } else if (splitType === 'greg_day2') {
           routineTitle = autoGregInfo ? `Coach Greg (${autoGregInfo.dayName}) - Day 2: Lower (Quads/Hams)` : "Coach Greg - Day 2: Lower (Quads/Hams)";
           dayExercises = [
             { id: 'leg_press', sets: 3, reps: 12, weight: 160, rest: 90 },
-            { id: 'seated_leg_curls', sets: 3, reps: 10, weight: 65, rest: 60 },
-            { id: 'leg_extension', sets: 2, reps: 12, weight: 80, rest: 60 }
+            { id: 'seated_leg_curls', sets: 3, reps: 10, weight: 65, rest: 90 },
+            { id: 'leg_extension', sets: 2, reps: 12, weight: 80, rest: 90 }
           ];
         } else if (splitType === 'greg_day3') {
           routineTitle = autoGregInfo ? `Coach Greg (${autoGregInfo.dayName}) - Day 3: Upper (Back/Arms)` : "Coach Greg - Day 3: Upper (Back/Arms)";
           dayExercises = [
-            { id: 'seated_cable_row', sets: 3, reps: 10, weight: 50, rest: 60 },
-            { id: 'pec_deck_fly', sets: 3, reps: 15, weight: 35, rest: 60 },
-            { id: 'cable_tricep_pushdown', sets: 2, reps: 12, weight: 45, rest: 60 }
+            { id: 'seated_cable_row', sets: 3, reps: 10, weight: 50, rest: 90 },
+            { id: 'pec_deck_fly', sets: 3, reps: 15, weight: 35, rest: 90 },
+            { id: 'cable_tricep_pushdown', sets: 2, reps: 12, weight: 45, rest: 90 }
           ];
         } else if (splitType === 'greg_day4') {
           routineTitle = autoGregInfo ? `Coach Greg (${autoGregInfo.dayName}) - Day 4: Lower (Posterior)` : "Coach Greg - Day 4: Lower (Posterior)";
           dayExercises = [
-            { id: 'lying_leg_curl', sets: 3, reps: 10, weight: 100, rest: 60 },
-            { id: 'seated_calf_raise', sets: 3, reps: 15, weight: 190, rest: 60 },
-            { id: 'weighted_machine_crunch', sets: 2, reps: 15, weight: 50, rest: 60 }
+            { id: 'lying_leg_curl', sets: 3, reps: 10, weight: 100, rest: 90 },
+            { id: 'seated_calf_raise', sets: 3, reps: 15, weight: 190, rest: 90 },
+            { id: 'weighted_machine_crunch', sets: 2, reps: 15, weight: 50, rest: 90 }
           ];
         }
 
@@ -1407,7 +1407,7 @@
           muscle: ex.muscle,
           equipment: ex.equipment,
           type: ex.type,
-          restSeconds: goal === 'strength' ? 90 : 60,
+          restSeconds: 90,
           sets: sets,
           gym: state.user.currentGym || 'Base Gym',
           machineLabel: ''
@@ -1526,7 +1526,7 @@
                   <span>•</span>
                   <span class="capitalize">${formatEquipment(ex.equipment)}</span>
                   <span>•</span>
-                  <span>Rest: ${ex.restSeconds || 60}s</span>
+                  <span>Rest: ${getRestSeconds(ex)}s</span>
                 </div>
                 ${coachNoteBox}
                 <div class="mt-2">
@@ -1665,7 +1665,7 @@
       if (set.completed) {
         playBeep(440, 0.08); // Feedback click tone
         // Auto start rest timer
-        triggerRestTimer(ex.restSeconds || 60);
+        triggerRestTimer(getRestSeconds(ex));
 
         // Check PR achievement
         checkPersonalRecord(ex, Number(set.weight), Number(set.reps));
@@ -1706,6 +1706,12 @@
       saveStateToStorage();
       renderWorkoutView();
       showToast("Exercise removed from routine.", "info");
+    }
+
+    // Treat legacy 60-second programmed values as the former default; preserve other explicit durations.
+    function getRestSeconds(ex) {
+      const seconds = Number(ex?.restSeconds);
+      return !Number.isFinite(seconds) || seconds === 60 ? 90 : seconds;
     }
 
     // Rest Timer System
@@ -2360,7 +2366,7 @@
         muscle: exTemplate.muscle,
         equipment: exTemplate.equipment,
         type: exTemplate.type,
-        restSeconds: exTemplate.restSeconds || 60,
+        restSeconds: getRestSeconds(exTemplate),
         coachNote: exTemplate.coachGreg ? exTemplate.coachGreg.note : null,
         coachRole: exTemplate.coachGreg ? exTemplate.coachGreg.role : null,
         fallbacks: exTemplate.fallbacks || [],
@@ -2395,7 +2401,7 @@
         muscle: exTemplate.muscle,
         equipment: exTemplate.equipment,
         type: exTemplate.type,
-        restSeconds: 60,
+        restSeconds: 90,
         sets: [
           { setNumber: 1, weight: exTemplate.defaultWeight, reps: 10, completed: false },
           { setNumber: 2, weight: exTemplate.defaultWeight, reps: 10, completed: false },
