@@ -504,7 +504,7 @@
   <div id="rest-timer-bar" class="hidden fixed bottom-16 sm:bottom-4 left-4 right-4 max-w-md mx-auto z-40 bg-zinc-900 border border-brand-500/40 rounded-2xl shadow-2xl p-3 backdrop-blur-lg flex items-center justify-between">
     <div class="flex items-center space-x-3">
       <div class="w-10 h-10 rounded-xl bg-brand-500/20 border border-brand-500/40 flex items-center justify-center font-mono font-bold text-brand-400 text-lg pulse-rest" id="rest-timer-display">
-        60s
+        01:30
       </div>
       <div>
         <h4 class="text-xs font-bold text-white uppercase tracking-wider">Rest Timer</h4>
@@ -555,7 +555,7 @@
       <div class="p-4 border-b border-zinc-800 flex items-center justify-between">
         <div>
           <h3 id="modal-picker-title" class="text-base font-bold text-white">Select Exercise</h3>
-          <p class="text-xs text-zinc-400">Choose a movement matching your equipment</p>
+          <p class="text-xs text-zinc-400">Recommended alternatives show their own benchmark and rest target</p>
         </div>
         <button onclick="closeModal('modal-exercise-picker')" class="p-1 rounded-lg text-zinc-400 hover:text-white bg-zinc-800">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -1278,7 +1278,9 @@
 
         const builtExercises = dayExercises.map(planItem => {
           const exTemplate = EXERCISE_DATABASE.find(e => e.id === planItem.id);
-          const pr = state.personalRecords[planItem.id];
+          const gym = state.user.currentGym || 'Base Gym';
+          const machineLabel = getLastMachineLabel(planItem.id, gym);
+          const pr = getExerciseContextPR({ ...exTemplate, gym, machineLabel });
           const baseWeight = pr ? pr.weight : planItem.weight;
 
           const sets = [];
@@ -1301,6 +1303,8 @@
             coachNote: exTemplate.coachGreg ? exTemplate.coachGreg.note : null,
             coachRole: exTemplate.coachGreg ? exTemplate.coachGreg.role : null,
             fallbacks: exTemplate.fallbacks || [],
+            gym,
+            machineLabel,
             sets: sets
           };
         });
@@ -1387,8 +1391,9 @@
       }
 
       const builtExercises = selected.map(ex => {
-        // Check if user has past recorded performance
-        const pr = state.personalRecords[ex.id];
+        const gym = state.user.currentGym || 'Base Gym';
+        const machineLabel = getLastMachineLabel(ex.id, gym);
+        const pr = getExerciseContextPR({ ...ex, gym, machineLabel });
         const baseWeight = pr ? pr.weight : ex.defaultWeight;
 
         const sets = [];
@@ -1409,8 +1414,8 @@
           type: ex.type,
           restSeconds: 90,
           sets: sets,
-          gym: state.user.currentGym || 'Base Gym',
-          machineLabel: ''
+          gym,
+          machineLabel
         };
       });
 
@@ -1498,7 +1503,12 @@
       // Render Exercise Cards
       container.innerHTML = w.exercises.map((ex, exIndex) => {
         const pr = getExerciseContextPR(ex);
-        const prBadge = pr ? `<span class="text-[10px] text-amber-400 font-medium ml-2">PR here: ${pr.weight}${state.user.unit} × ${pr.reps}</span>` : '';
+        const contextGym = escapeHistoryText(ex.gym || w.gym || state.user.currentGym || 'Base Gym');
+        const contextMachine = escapeHistoryText(ex.machineLabel || formatEquipment(ex.equipment));
+        const historicalPr = state.personalRecords[ex.id];
+        const prBadge = pr
+          ? `<span class='text-[10px] text-amber-400 font-medium ml-2'>Matched here · ${contextGym} / ${contextMachine}: ${pr.weight}${state.user.unit} × ${pr.reps}</span>`
+          : `<span class='text-[10px] text-zinc-500 font-medium ml-2'>${historicalPr ? `No same-setup benchmark · older PR ${historicalPr.weight}${state.user.unit} × ${historicalPr.reps} (setup unknown)` : 'No same-setup benchmark yet'}</span>`;
         const coachBadge = ex.coachRole ? `
           <span class="text-[10px] font-bold px-2 py-0.5 rounded ml-2 ${ex.coachRole === 'primary' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-zinc-800 text-zinc-300 border border-zinc-700'}">
             ${ex.coachRole === 'primary' ? '⭐ Coach Primary' : '🔄 Fallback'}
@@ -1539,9 +1549,9 @@
 
               <!-- Exercise Action Menu -->
               <div class="flex items-center space-x-1">
-                <button onclick="openSwapExerciseModal(${exIndex})" title="Swap or Select Fallback" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors flex items-center space-x-1 text-xs font-medium">
+                <button onclick="openBusyAlternatives(${exIndex})" title="Suggest an alternative if this station is busy" class="px-2.5 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white transition-colors flex items-center space-x-1 text-xs font-medium">
                   <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                  <span>Swap</span>
+                  <span>Station busy?</span>
                 </button>
                 <button onclick="removeExerciseFromWorkout(${exIndex})" title="Remove Exercise" class="p-1.5 rounded-lg bg-zinc-800 hover:bg-rose-500/20 text-zinc-400 hover:text-rose-400 transition-colors">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -1665,7 +1675,7 @@
       if (set.completed) {
         playBeep(440, 0.08); // Feedback click tone
         // Auto start rest timer
-        triggerRestTimer(getRestSeconds(ex));
+        triggerRestTimer(getRestSeconds(ex), ex);
 
         // Check PR achievement
         checkPersonalRecord(ex, Number(set.weight), Number(set.reps));
@@ -1715,8 +1725,10 @@
     }
 
     // Rest Timer System
-    function triggerRestTimer(seconds) {
+    function triggerRestTimer(seconds, exercise) {
       restRemainingSeconds = seconds;
+      const context = exercise ? [exercise.gym || state.currentWorkout.gym || state.user.currentGym || 'Base Gym', exercise.machineLabel || formatEquipment(exercise.equipment)].join(' · ') : '';
+      document.getElementById('rest-timer-subtitle').innerText = exercise ? `After ${exercise.name} · ${context}` : 'Catch your breath & prepare next set';
       const bar = document.getElementById('rest-timer-bar');
       bar.classList.remove('hidden');
       updateRestTimerDisplay();
@@ -1736,7 +1748,9 @@
     }
 
     function updateRestTimerDisplay() {
-      document.getElementById('rest-timer-display').innerText = `${restRemainingSeconds}s`;
+      const minutes = Math.floor(restRemainingSeconds / 60);
+      const seconds = restRemainingSeconds % 60;
+      document.getElementById('rest-timer-display').innerText = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
 
     function adjustRestTimer(delta) {
@@ -1823,7 +1837,20 @@
     }
 
     function getExerciseContextPR(ex) {
-      return state.personalRecords[getExerciseContextKey(ex)] || state.personalRecords[ex.id] || null;
+      // Legacy exercise-only records remain stored, but never compare across unknown gyms or machines.
+      return state.personalRecords[getExerciseContextKey(ex)] || null;
+    }
+
+    function getLastMachineLabel(exerciseId, gym = state.currentWorkout.gym || state.user.currentGym || 'Base Gym') {
+      const targetGym = normalizeContextPart(gym);
+      for (const session of state.history || []) {
+        for (const logged of session.exercises || []) {
+          const loggedGym = logged.gym || session.gym || 'Base Gym';
+          const machineLabel = String(logged.machineLabel || '').trim();
+          if (logged.id === exerciseId && machineLabel && normalizeContextPart(loggedGym) === targetGym) return machineLabel;
+        }
+      }
+      return '';
     }
 
     function updateExerciseContext(exIndex, field, value) {
@@ -1993,7 +2020,10 @@
       }
 
       listEl.innerHTML = filtered.map(ex => {
-        const pr = state.personalRecords[ex.id];
+        const gym = state.currentWorkout.gym || state.user.currentGym || 'Base Gym';
+        const machineLabel = getLastMachineLabel(ex.id, gym);
+        const pr = getExerciseContextPR({ ...ex, gym, machineLabel });
+        const historicalPr = state.personalRecords[ex.id];
         const coachBadge = ex.coachGreg ? `
           <span class="text-[10px] font-bold px-2 py-0.5 rounded ${ex.coachGreg.role === 'primary' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-zinc-800 text-zinc-300 border border-zinc-700'}">
             ${ex.coachGreg.role === 'primary' ? `⭐ Coach ${ex.coachGreg.day || 'Primary'}` : '🔄 Fallback'}
@@ -2026,7 +2056,7 @@
 
             <div class="mt-3 pt-2 border-t border-zinc-800/80 flex items-center justify-between text-xs">
               <span class="text-zinc-500 text-[11px]">
-                ${pr ? `🏆 1RM Est: <strong class="text-zinc-300">${pr.estimated1RM || pr.weight}${state.user.unit}</strong>` : `Baseline: ${ex.defaultWeight}${state.user.unit}`}
+                ${pr ? `🏆 Same-setup 1RM: <strong class="text-zinc-300">${pr.estimated1RM || pr.weight}${state.user.unit}</strong>` : historicalPr ? `Older PR (setup unknown): <strong class="text-zinc-300">${historicalPr.weight}${state.user.unit} × ${historicalPr.reps}</strong>` : `No same-setup PR · baseline: ${ex.defaultWeight}${state.user.unit}`}
               </span>
               <button onclick="addSpecificExerciseToCurrentRoutine('${ex.id}')" class="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-brand-500 hover:text-black font-semibold text-[11px] text-zinc-300 transition-colors">
                 + Add to Workout
@@ -2254,11 +2284,15 @@
 
     let exerciseSwapTargetIndex = null;
 
-    function openSwapExerciseModal(exIndex) {
+    function openBusyAlternatives(exIndex) {
       exerciseSwapTargetIndex = exIndex;
       const targetEx = state.currentWorkout.exercises[exIndex];
-      document.getElementById('modal-picker-title').innerText = `Swap ${targetEx.name}`;
+      document.getElementById('modal-picker-title').innerText = `Station busy? ${targetEx.name}`;
       openExercisePicker(targetEx.muscle);
+    }
+
+    function openSwapExerciseModal(exIndex) {
+      openBusyAlternatives(exIndex);
     }
 
     function openAddExerciseModal() {
@@ -2277,6 +2311,7 @@
       const query = (document.getElementById('picker-search-input').value || '').toLowerCase();
       const container = document.getElementById('picker-exercises-list');
       const targetEx = exerciseSwapTargetIndex !== null ? state.currentWorkout.exercises[exerciseSwapTargetIndex] : null;
+      const contextGym = targetEx?.gym || state.currentWorkout.gym || state.user.currentGym || 'Base Gym';
 
       let fallbackIds = [];
       if (targetEx) {
@@ -2311,7 +2346,7 @@
       if (targetEx && fallbackIds.length > 0) {
         bannerHtml = `
           <div class="p-2.5 mb-2 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between text-xs text-amber-300">
-            <span>⚡ <strong>Coach Greg Fallbacks</strong> prioritized for this exercise</span>
+            <span>⚡ <strong>Station-busy alternatives</strong> prioritized for ${targetEx.name}</span>
             <span class="text-[10px] uppercase font-bold text-amber-400 bg-amber-500/20 px-2 py-0.5 rounded">${fallbackIds.length} Available</span>
           </div>
         `;
@@ -2319,6 +2354,12 @@
 
       container.innerHTML = bannerHtml + matches.map(ex => {
         const isDesignatedFallback = fallbackIds.includes(ex.id);
+        const machineLabel = getLastMachineLabel(ex.id, contextGym);
+        const contextPR = getExerciseContextPR({ ...ex, gym: contextGym, machineLabel });
+        const contextDescription = `${escapeHistoryText(contextGym)} · ${escapeHistoryText(machineLabel || formatEquipment(ex.equipment))}`;
+        const contextSummary = contextPR
+          ? `Matched benchmark: ${contextPR.weight}${state.user.unit} × ${contextPR.reps}`
+          : 'No benchmark for this setup yet';
         const coachBadge = ex.coachGreg ? `
           <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${ex.coachGreg.role === 'primary' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-zinc-800 text-zinc-300 border border-zinc-700'}">
             ${ex.coachGreg.role === 'primary' ? '⭐ Coach Primary' : '🔄 Fallback'}
@@ -2338,6 +2379,7 @@
               <div class="text-[11px] text-zinc-400 mt-0.5">
                 <span class="capitalize text-brand-400">${ex.muscle}</span> • ${formatEquipment(ex.equipment)}
               </div>
+              <p class="text-[10px] text-zinc-500 mt-1">Rest ${getRestSeconds(ex)}s · ${contextSummary}<br>Comparing against: ${contextDescription}</p>
               ${ex.coachGreg ? `<p class="text-[10px] text-amber-300/70 italic mt-0.5">${ex.coachGreg.note}</p>` : ''}
             </div>
             <span class="text-xs font-bold text-zinc-400 hover:text-white shrink-0 ml-2">Select →</span>
@@ -2355,9 +2397,12 @@
       const exTemplate = EXERCISE_DATABASE.find(e => e.id === exerciseId);
       if (!exTemplate) return;
 
-      const setsCount = exTemplate.defaultSets || (state.user.trainingGoal === 'strength' ? 4 : 3);
-      const targetReps = exTemplate.defaultReps || (state.user.trainingGoal === 'strength' ? 5 : (state.user.trainingGoal === 'endurance' ? 15 : 10));
-      const pr = state.personalRecords[exTemplate.id];
+      const targetEx = exerciseSwapTargetIndex !== null ? state.currentWorkout.exercises[exerciseSwapTargetIndex] : null;
+      const gym = targetEx?.gym || state.currentWorkout.gym || state.user.currentGym || 'Base Gym';
+      const machineLabel = getLastMachineLabel(exTemplate.id, gym);
+      const pr = getExerciseContextPR({ ...exTemplate, gym, machineLabel });
+      const setsCount = targetEx ? Math.max(1, targetEx.sets.length) : exTemplate.defaultSets || (state.user.trainingGoal === 'strength' ? 4 : 3);
+      const targetReps = targetEx?.sets?.[0]?.reps || exTemplate.defaultReps || (state.user.trainingGoal === 'strength' ? 5 : (state.user.trainingGoal === 'endurance' ? 15 : 10));
       const weight = pr ? pr.weight : exTemplate.defaultWeight;
 
       const newExercise = {
@@ -2370,6 +2415,8 @@
         coachNote: exTemplate.coachGreg ? exTemplate.coachGreg.note : null,
         coachRole: exTemplate.coachGreg ? exTemplate.coachGreg.role : null,
         fallbacks: exTemplate.fallbacks || [],
+        gym,
+        machineLabel,
         sets: Array.from({ length: setsCount }, (_, i) => ({
           setNumber: i + 1,
           weight: weight,
