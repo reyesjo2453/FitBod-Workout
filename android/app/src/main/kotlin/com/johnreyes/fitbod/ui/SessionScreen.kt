@@ -121,7 +121,8 @@ private class SessionOps(private val repo: Repository) {
     }
 
     fun rest(deltaSec: Int, now: Long) = repo.updateSession { s ->
-        s?.restEndsAt?.let { end -> s.copy(restEndsAt = maxOf(now, end + deltaSec * 1000L), restTotal = s.restTotal + deltaSec) } ?: s
+        val end = s?.restEndsAt ?: return@updateSession s
+        s.copy(restEndsAt = maxOf(now, end + deltaSec * 1000L), restTotal = (s.restTotal + deltaSec).coerceAtLeast(1))
     }
 
     fun skipRest() = repo.updateSession { it?.copy(restEndsAt = null) }
