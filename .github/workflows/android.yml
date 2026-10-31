@@ -1,0 +1,47 @@
+name: Android APK
+
+on:
+  push:
+    paths:
+      - "android/**"
+      - ".github/workflows/android.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: android
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Test sync format and build debug APK
+        run: ./gradlew --no-daemon :core:test :app:assembleDebug
+
+      # Optional: sign a release build with your original FitBod keystore so it installs
+      # as an update over the current app. Add repository secrets FITBOD_KEYSTORE_BASE64,
+      # FITBOD_KEYSTORE_PASSWORD, FITBOD_KEY_ALIAS and FITBOD_KEY_PASSWORD.
+      - name: Build signed release APK
+        env:
+          KEYSTORE_B64: ${{ secrets.FITBOD_KEYSTORE_BASE64 }}
+          FITBOD_KEYSTORE_PASSWORD: ${{ secrets.FITBOD_KEYSTORE_PASSWORD }}
+          FITBOD_KEY_ALIAS: ${{ secrets.FITBOD_KEY_ALIAS }}
+          FITBOD_KEY_PASSWORD: ${{ secrets.FITBOD_KEY_PASSWORD }}
+        if: env.KEYSTORE_B64 != ''
+        run: |
+          echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          FITBOD_KEYSTORE="$RUNNER_TEMP/release.jks" ./gradlew --no-daemon :app:assembleRelease
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fitbod-apk
+          path: android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
