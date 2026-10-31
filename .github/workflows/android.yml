@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     defaults:
       run:
         working-directory: android
@@ -45,3 +47,18 @@ jobs:
           name: fitbod-apk
           path: android/app/build/outputs/apk/**/*.apk
           if-no-files-found: error
+
+      # Keep the latest APKs on a separate branch so they can be fetched with git.
+      - name: Publish APK to apk-builds branch
+        if: github.event_name != 'pull_request'
+        working-directory: .
+        run: |
+          mkdir -p "$RUNNER_TEMP/apk"
+          find android/app/build/outputs/apk -name '*.apk' -exec cp {} "$RUNNER_TEMP/apk/" \;
+          cd "$RUNNER_TEMP/apk"
+          git init -q -b apk-builds
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -q -m "APK from ${GITHUB_SHA::7} (${GITHUB_REF_NAME})"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" apk-builds
