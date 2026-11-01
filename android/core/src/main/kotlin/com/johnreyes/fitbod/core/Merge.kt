@@ -5,7 +5,9 @@ import kotlinx.serialization.json.JsonObject
 /**
  * Combines this device's document with the copy in Google Drive.
  *
- * - Workouts are matched by `syncId`; the newer `updatedAt` wins.
+ * - Workouts are matched by `syncId`; the newer `updatedAt` wins. On a tie the Drive
+ *   copy wins, so an edit another tool made to the file without bumping `updatedAt`
+ *   isn't overwritten (the phone always bumps `updatedAt` when it edits a workout).
  * - Tombstones are unioned and remove any workout not edited after its deletion.
  * - Exercises are unioned by name, so history never points at a missing exercise.
  * - Routines, templates, recovery, gyms and settings have no per-record timestamps:
@@ -23,7 +25,7 @@ object Merge {
         for (w in remote.workouts) byId[w.syncId] = w
         for (w in local.workouts) {
             val other = byId[w.syncId]
-            if (other == null || w.updatedAt >= other.updatedAt) byId[w.syncId] = w
+            if (other == null || w.updatedAt > other.updatedAt) byId[w.syncId] = w
         }
         val workouts = byId.values
             .filter { w -> deletedAt[w.syncId]?.let { w.updatedAt > it } ?: true }

@@ -47,13 +47,23 @@ target weight.
   style as the original app. Any fields this app doesn't know about (for example
   `templates`, or extra keys other tools add to workouts) are kept exactly as they
   are.
-- Workouts merge by `syncId`; the newer `updatedAt` wins. Deletions are recorded in
-  `tombstones`, so a workout deleted on one device stays deleted. Workouts that other
-  writers (such as Merlin) add to the file are picked up on the next sync.
+- **Two-way sync.** Every sync downloads `fitbod-sync.json`, merges it with the
+  phone's copy and uploads the result to the same file (same file ID, updated in
+  place), so tools that read the Drive file, such as Meta Muse, always see one
+  up-to-date file, and changes those tools make to it come back to the phone.
+- Workouts merge by `syncId`; the newer `updatedAt` wins. On a tie the Drive copy
+  wins, so an edit made directly in the file isn't overwritten. Deletions are recorded
+  in `tombstones`, so a workout deleted on one device stays deleted. Workouts that
+  other writers add to the file (with or without a `syncId`) are picked up.
 - Routines, gyms, settings and the exercise library have no timestamps. Changes you
   make on the phone win until they are synced; otherwise the Drive copy wins.
-- Sync runs when the app comes to the foreground, after you finish or delete a
-  workout, and from **Settings → Sync now**.
+- When sync runs:
+  - a few seconds after any change on the phone (finishing or deleting a workout,
+    editing a routine, changing a setting). If you're offline, it runs as soon as
+    you're back online, even if the app is closed;
+  - when the app comes to the foreground;
+  - every hour in the background, to pick up changes made in Drive;
+  - from **Settings → Sync now**.
 - In-progress workouts stay on the phone (`session.json`) and are written to Drive
   only when you finish them, as `status: "done"`.
 

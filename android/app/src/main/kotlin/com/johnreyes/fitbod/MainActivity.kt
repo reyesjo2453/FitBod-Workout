@@ -30,6 +30,7 @@ class FitbodApp : Application() {
     override fun onCreate() {
         super.onCreate()
         repo = Repository(this)
+        SyncWorker.schedulePeriodic(this)
         // Pull changes (e.g. workouts Merlin logged) whenever the app comes to the foreground.
         ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) = repo.syncNow()

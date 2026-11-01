@@ -24,6 +24,24 @@ class MergeAndAnalyticsTest {
     }
 
     @Test
+    fun externalEditWithoutTimestampBumpIsNotOverwritten() {
+        // Another tool edits the Drive file in place and leaves updatedAt alone.
+        val local = base.copy(workouts = listOf(workout("a", 10)))
+        val remote = base.copy(workouts = listOf(workout("a", 10).copy(title = "Set A — edited in Drive")))
+        val merged = Merge.merge(local, remote, emptySet(), now = 99)
+        assertEquals("Set A — edited in Drive", merged.workouts.single().title)
+    }
+
+    @Test
+    fun fieldsAddedInDriveSurviveSyncRoundTrip() {
+        val text = SyncCodec.encode(base)
+            .replaceFirst("\"syncId\"", "\"note\":\"added by another tool\",\"syncId\"")
+        val remote = SyncCodec.decode(text)
+        val pushed = SyncCodec.decode(SyncCodec.encode(Merge.merge(base, remote, emptySet(), now = 99)))
+        assertTrue(pushed.workouts.any { it.extra["note"]?.toString() == "\"added by another tool\"" })
+    }
+
+    @Test
     fun tombstonesDeleteOnBothSides() {
         val deleted = Edits.deleteWorkout(base, "pc-workout-1", now = 50).doc
         val merged = Merge.merge(deleted, base, emptySet(), now = 60)

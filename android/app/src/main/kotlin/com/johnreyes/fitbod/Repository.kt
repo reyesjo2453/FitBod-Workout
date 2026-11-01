@@ -22,6 +22,8 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import java.io.File
 
+enum class SyncResult { OK, SIGNED_OUT, NEEDS_CONSENT, FAILED }
+
 sealed interface SyncState {
     data object Idle : SyncState
     data object Syncing : SyncState
@@ -76,6 +78,9 @@ class Repository(private val context: Context) {
             _pending.value = true
             persist(result.doc)
         }
+        // Push every change to Drive shortly after it's made (and later, if offline),
+        // so tools reading the Drive file always see current data.
+        SyncWorker.pushSoon(context)
     }
 
     /** Replaces local data with an imported backup, keeping workouts from both. */
@@ -113,13 +118,16 @@ class Repository(private val context: Context) {
 
     fun syncNow() {
         if (_account.value == null) return
-        scope.launch { syncMutex.withLock { runSync() } }
+        scope.launch { sync() }
     }
 
-    private fun runSync() {
+    /** Two-way sync: pulls the Drive file, merges, and writes the result back. */
+    suspend fun sync(): SyncResult = syncMutex.withLock { runSync() }
+
+    private fun runSync(): SyncResult {
         val account = GoogleSignIn.getLastSignedInAccount(context)?.account ?: run {
             _account.value = null
-            return
+            return SyncResult.SIGNED_OUT
         }
         _sync.value = SyncState.Syncing
         try {
@@ -134,11 +142,14 @@ class Repository(private val context: Context) {
             val now = System.currentTimeMillis()
             prefs.edit().putLong(KEY_LAST_SYNC, now).apply()
             _sync.value = SyncState.Done(now)
+            return SyncResult.OK
         } catch (e: UserRecoverableAuthException) {
             consentIntent.value = e.intent
             _sync.value = SyncState.Failed("Google needs permission to reach your FitBod folder")
+            return SyncResult.NEEDS_CONSENT
         } catch (e: Exception) {
             _sync.value = SyncState.Failed(e.message ?: e.javaClass.simpleName)
+            return SyncResult.FAILED
         }
     }
 
