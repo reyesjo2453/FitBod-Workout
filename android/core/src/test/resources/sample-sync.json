@@ -1,0 +1,121 @@
+{
+ "version": 2,
+ "exportedAt": 1793407945442,
+ "exercises": [
+  {
+   "id": 1,
+   "name": "Machine Chest Press",
+   "baseline": "same-setup 1RM 166 lbs",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 24,
+   "name": "Pec Deck \/ Machine Fly",
+   "baseline": "no PR yet",
+   "cue": "Control the eccentric and keep the setup consistent."
+  }
+ ],
+ "routines": [
+  {
+   "routine": "Set A — Full Body",
+   "exercise": "Machine Chest Press",
+   "targetSets": 3,
+   "targetWeight": 100,
+   "targetReps": 10,
+   "restSeconds": 90,
+   "sortOrder": 1
+  },
+  {
+   "routine": "Set B — Full Body",
+   "exercise": "Pec Deck \/ Machine Fly",
+   "targetSets": 3,
+   "targetWeight": 65,
+   "targetReps": 10,
+   "restSeconds": null,
+   "sortOrder": 1
+  }
+ ],
+ "workouts": [
+  {
+   "syncId": "pc-workout-1",
+   "updatedAt": 0,
+   "date": "2026-09-15",
+   "title": "Coach Greg - Day 1: Upper (Push\/Pull)",
+   "volume": 5270,
+   "setCount": null,
+   "durationMinutes": null,
+   "gym": null,
+   "exerciseNames": [],
+   "status": "done",
+   "sets": []
+  },
+  {
+   "syncId": "local-e448e9de-a9f9-45ab-8e0a-e3e72381fee3",
+   "updatedAt": 1792773275160,
+   "date": "2026-10-23",
+   "title": "Set A — Full Body",
+   "volume": 2700,
+   "setCount": 3,
+   "durationMinutes": null,
+   "gym": "Base Gym",
+   "exerciseNames": [
+    "Machine Chest Press"
+   ],
+   "status": "done",
+   "sets": [
+    {
+     "exercise": "Machine Chest Press",
+     "setNumber": 1,
+     "weight": 100,
+     "reps": 10,
+     "completed": true,
+     "supersetGroup": null
+    },
+    {
+     "exercise": "Machine Chest Press",
+     "setNumber": 2,
+     "weight": 100,
+     "reps": 10,
+     "completed": true,
+     "supersetGroup": "B"
+    },
+    {
+     "exercise": "Machine Chest Press",
+     "setNumber": 3,
+     "weight": 100.5,
+     "reps": 7,
+     "completed": true,
+     "supersetGroup": null,
+     "rpe": 8
+    }
+   ],
+   "plan": {"note": "kept by other writers"}
+  }
+ ],
+ "templates": [
+  {"id": 1, "name": "Quick Upper", "defaultRest": 60, "items": [{"exercise": "Push Up"}]}
+ ],
+ "recovery": [
+  {
+   "muscle": "Chest",
+   "availableAt": null
+  },
+  {
+   "muscle": "Quads",
+   "availableAt": 1792773275160
+  }
+ ],
+ "gyms": [
+  "Base Gym",
+  "Planet Fitness",
+  "Home"
+ ],
+ "settings": {
+  "gym_goal": "Hypertrophy 8–12",
+  "split": "Set A \/ Set B rotation",
+  "units": "lbs",
+  "default_rest_seconds": "90"
+ },
+ "tombstones": [],
+ "futureTopLevel": {"a": 1}
+}

@@ -1,5 +1,7 @@
 # FitBod Local
 
+> **New:** a native Android app for the Galaxy Z Fold lives in [`android/`](android/README.md). It syncs the same `FitBod/fitbod-sync.json` file in Google Drive as the previous Android app. The browser version below is unchanged.
+
 FitBod Local is a browser-based workout planner and log. It builds routines around your training goal, available equipment, workout split, and estimated muscle recovery, then lets you record sets and review your progress. The routine generation runs in the app; no AI account or API key is required.
 
 ## What you can do

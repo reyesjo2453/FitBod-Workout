@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.Fitbod" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:statusBarColor">@color/bg</item>
+        <item name="android:navigationBarColor">@color/bg</item>
+    </style>
+    <color name="bg">#FF0E0F13</color>
+    <color name="accent">#FFFF5A4E</color>
+</resources>

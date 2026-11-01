@@ -1,0 +1,306 @@
+{
+ "version": 2,
+ "exportedAt": 0,
+ "exercises": [
+  {
+   "id": 1,
+   "name": "Machine Chest Press",
+   "baseline": "same-setup 1RM 166 lbs",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 2,
+   "name": "Seated Cable Row",
+   "baseline": "same-setup 1RM 133 lbs",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 3,
+   "name": "Lat Pulldown Machine",
+   "baseline": "144 lbs",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 4,
+   "name": "Machine Shoulder Press",
+   "baseline": "84 lbs",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 5,
+   "name": "Machine Leg Press",
+   "baseline": "245 lbs",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 6,
+   "name": "Cable Tricep Pushdown",
+   "baseline": "50 lbs",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 7,
+   "name": "Lying Leg Curl",
+   "baseline": "81 lbs",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 8,
+   "name": "Incline Chest Press (Machine/DB)",
+   "baseline": "older PR 65 lbs x 10",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 9,
+   "name": "Machine Leg Extension",
+   "baseline": "baseline 80",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 10,
+   "name": "Seated Leg Curls",
+   "baseline": "baseline 65",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 11,
+   "name": "Seated Calf Raise",
+   "baseline": "baseline 190",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 12,
+   "name": "Weighted Machine Crunch",
+   "baseline": "baseline 50",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 13,
+   "name": "Barbell Bench Press",
+   "baseline": "baseline 135",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 14,
+   "name": "Barbell Back Squat",
+   "baseline": "baseline 185",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 15,
+   "name": "Barbell Deadlift",
+   "baseline": "baseline 185",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 16,
+   "name": "Barbell Bent Over Row",
+   "baseline": "baseline 115",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 17,
+   "name": "Barbell Bicep Curl",
+   "baseline": "baseline 65",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 18,
+   "name": "Dumbbell Bench Press",
+   "baseline": "baseline 50",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 19,
+   "name": "Dumbbell Goblet Squat",
+   "baseline": "baseline 50",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 20,
+   "name": "Overhead Barbell Press",
+   "baseline": "baseline 95",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 21,
+   "name": "Machine Hack Squat",
+   "baseline": "baseline 140",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 22,
+   "name": "Barbell Romanian Deadlift",
+   "baseline": "baseline 135",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 23,
+   "name": "Incline Barbell Bench Press",
+   "baseline": "baseline 115",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 24,
+   "name": "Pec Deck / Machine Fly",
+   "baseline": "no PR yet",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 25,
+   "name": "Barbell Hip Thrust",
+   "baseline": "no PR yet",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 26,
+   "name": "Push Up",
+   "baseline": "no PR yet",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 27,
+   "name": "Pull Up",
+   "baseline": "no PR yet",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 28,
+   "name": "Parallel Bar Dips",
+   "baseline": "no PR yet",
+   "cue": "Control the eccentric and keep the setup consistent."
+  },
+  {
+   "id": 29,
+   "name": "Forearm Plank",
+   "baseline": "no PR yet",
+   "cue": "Control the eccentric and keep the setup consistent."
+  }
+ ],
+ "routines": [
+  {
+   "routine": "Set A — Full Body",
+   "exercise": "Machine Chest Press",
+   "targetSets": 3,
+   "targetWeight": 100,
+   "targetReps": 10,
+   "restSeconds": 90,
+   "sortOrder": 1
+  },
+  {
+   "routine": "Set A — Full Body",
+   "exercise": "Lat Pulldown Machine",
+   "targetSets": 3,
+   "targetWeight": 100,
+   "targetReps": 10,
+   "restSeconds": null,
+   "sortOrder": 2
+  },
+  {
+   "routine": "Set A — Full Body",
+   "exercise": "Machine Leg Press",
+   "targetSets": 3,
+   "targetWeight": 170,
+   "targetReps": 10,
+   "restSeconds": 90,
+   "sortOrder": 3
+  },
+  {
+   "routine": "Set A — Full Body",
+   "exercise": "Machine Shoulder Press",
+   "targetSets": 2,
+   "targetWeight": 50,
+   "targetReps": 10,
+   "restSeconds": null,
+   "sortOrder": 4
+  },
+  {
+   "routine": "Set B — Full Body",
+   "exercise": "Seated Cable Row",
+   "targetSets": 3,
+   "targetWeight": 100,
+   "targetReps": 10,
+   "restSeconds": 90,
+   "sortOrder": 1
+  },
+  {
+   "routine": "Set B — Full Body",
+   "exercise": "Pec Deck / Machine Fly",
+   "targetSets": 3,
+   "targetWeight": 65,
+   "targetReps": 10,
+   "restSeconds": 90,
+   "sortOrder": 2
+  },
+  {
+   "routine": "Set B — Full Body",
+   "exercise": "Cable Tricep Pushdown",
+   "targetSets": 3,
+   "targetWeight": 40,
+   "targetReps": 10,
+   "restSeconds": 75,
+   "sortOrder": 3
+  },
+  {
+   "routine": "Set B — Full Body",
+   "exercise": "Lying Leg Curl",
+   "targetSets": 3,
+   "targetWeight": 65,
+   "targetReps": 10,
+   "restSeconds": 90,
+   "sortOrder": 4
+  }
+ ],
+ "workouts": [],
+ "templates": [],
+ "recovery": [
+  {
+   "muscle": "Chest",
+   "availableAt": null
+  },
+  {
+   "muscle": "Shoulders",
+   "availableAt": null
+  },
+  {
+   "muscle": "Quads",
+   "availableAt": null
+  },
+  {
+   "muscle": "Hamstrings",
+   "availableAt": null
+  },
+  {
+   "muscle": "Glutes",
+   "availableAt": null
+  },
+  {
+   "muscle": "Biceps",
+   "availableAt": null
+  },
+  {
+   "muscle": "Triceps",
+   "availableAt": null
+  },
+  {
+   "muscle": "Abs",
+   "availableAt": null
+  },
+  {
+   "muscle": "Calves",
+   "availableAt": null
+  }
+ ],
+ "gyms": [
+  "Base Gym",
+  "Planet Fitness",
+  "Home"
+ ],
+ "settings": {
+  "gym_goal": "Hypertrophy 8–12",
+  "split": "Set A / Set B rotation",
+  "units": "lbs",
+  "default_rest_seconds": "90"
+ },
+ "tombstones": []
+}
